@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+
+  nodeapp:
+    build:
+      context: node
+    entrypoint: dockerize -wait tcp://db:3306 -timeout 20s node index.js
+
+  proxy:
+    build:
+      context: nginx
+    ports:
+      - "8080:80"
+
+  db:
+    image: mysql:8
+    command: --default-authentication-plugin=mysql_native_password
+    container_name: db
+    restart: always
+    volumes: 
+      - ./mysql:/var/lib/mysql
+    environment: 
+      - MYSQL_DATABASE=nodedb
+      - MYSQL_ROOT_PASSWORD=rootpasswd
